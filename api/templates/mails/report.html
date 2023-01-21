@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  <!--begin:Logo-->
+  {% include 'parts/logo.html' %}
+  <!--end:Logo-->
+  <div class="header-separator"></div>
+  <!--begin:Text-->
+  <div style="font-size: 14px; font-weight: 500; margin-bottom: 27px; font-family:Arial,Helvetica,sans-serif;">
+    <p style="margin-bottom:9px; color:#181C32; font-size: 18px; font-weight:700">Hi,</p>
+    <p>Some configurations were changed, below you can find a report.</p>
+    <p style="font-size: 18px; margin-bottom: 0px;">Summary:</p>
+    <table>
+      <tbody>
+        <tr>
+          <td style="min-width: 140px; padding-left: 13px;"> - configs with error:</td>
+          <td>{{ user_configs['fail'] | length}}</td>
+        </tr>
+        <tr>
+          <td style="min-width: 140px; padding-left: 13px;"> - configs changed:</td>
+          <td>{{ user_configs['success'] | length}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 18px; margin-bottom: 0px;">Report table</p>
+    <div>
+      <div class="table-responsive">
+        <table class="table table-row-bordered gy-3 vertical-middle">
+          <thead>
+            <tr class="fw-bold fs-6 text-gray-800">
+              <th class="d-none d-sm-table-cell">Repository</th>
+              <th>Config name</th>
+<!--              <th class="d-none d-md-table-cell">Group</th>-->
+              <th class="d-none d-sm-table-cell">Node</th>
+              <th class="d-none d-md-table-cell">Script</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c_id in user_configs['fail'][0:20] %}
+            <tr>
+              <!--repo name-->
+              <td class="d-none d-sm-table-cell max-w-100px table-cell-ellipsis">{{ repos[configs[c_id].repo_id] }}</td>
+              <!--config name-->
+              <td class="max-w-150px table-cell-ellipsis">{{ configs[c_id].name }}</td>
+              <!--node name and address-->
+              <td class="d-none d-sm-table-cell max-w-150px table-cell-ellipsis">
+                {{ configs[c_id].node.name }}
+                <p class="m-0 text-muted table-data-ellipsis">Address: {{configs[c_id].node.address}}</p>
+              </td>
+              <!--script name and type-->
+              <td class="d-none d-md-table-cell">
+                {{ configs[c_id].script.name }}
+                <p class="m-0 table-data-ellipsis">
+                  {% if configs[c_id].script.wget %}
+                      <span class="badge badge-light-primary">WGet</span>
+                  {% endif %}
+                  {% if configs[c_id].script.file_transfer %}
+                      <span class="badge badge-light-info">File transfer ({{configs[c_id].script.file_transfer.protocol}})</span>
+                  {% endif %}
+                  {% if configs[c_id].script.expect %}
+                      <span class="badge badge-light-warning">Expect ({{configs[c_id].script.expect.protocol}})</span>
+                  {% endif %}
+                </p>
+              </td>
+              <td><span class="badge badge-danger">Fail</span></td>
+              <td><a href="{{base_url}}/tracker-repos/repo-viewer/{{configs[c_id].repo_id}}?report={{configs[c_id].id}}">🔍</a></td>
+            </tr>
+            {% endfor %}
+
+            {% if user_configs['fail'] | length > 20 %}
+            <tr class="report-separator">
+                {% set hidden_error_len = user_configs['fail'] | length - 20 %}
+                <td colspan="100%">... other {{hidden_error_len}} errors were hidden for the sake of brevity</td>
+            </tr>
+            {% endif %}
+
+            {% for c_id in user_configs['success'][0:20] %}
+            <tr>
+              <!--repo name-->
+              <td class="d-none d-sm-table-cell max-w-100px table-cell-ellipsis">{{ repos[configs[c_id].repo_id] }}</td>
+              <!--config name-->
+              <td class="max-w-150px table-cell-ellipsis">{{ configs[c_id].name }}</td>
+              <!--node name and address-->
+              <td class="d-none d-sm-table-cell max-w-150px table-cell-ellipsis">
+                {{ configs[c_id].node.name }}
+                <p class="m-0 text-muted table-data-ellipsis">Address: {{configs[c_id].node.address}}</p>
+              </td>
+              <!--script name and type-->
+              <td class="d-none d-md-table-cell">
+                {{ configs[c_id].script.name }}
+                <p class="m-0 table-data-ellipsis">
+                  {% if configs[c_id].script.wget %}
+                      <span class="badge badge-light-primary">WGet</span>
+                  {% endif %}
+                  {% if configs[c_id].script.file_transfer %}
+                      <span class="badge badge-light-info">File transfer ({{configs[c_id].script.file_transfer.protocol}})</span>
+                  {% endif %}
+                  {% if configs[c_id].script.expect %}
+                      <span class="badge badge-light-warning">Expect ({{configs[c_id].script.expect.protocol}})</span>
+                  {% endif %}
+                </p>
+              </td>
+              <td><span class="badge badge-success">Success</span></td>
+              <td><a href="{{base_url}}/tracker-repos/repo-viewer/{{configs[c_id].repo_id}}/config-viewer/{{configs[c_id].id}}">🔍</a></td>
+            </tr>
+            {% endfor %}
+
+            {% if user_configs['success'] | length > 20 %}
+            <tr class="report-separator">
+                {% set hidden_success_len = user_configs['success'] | length - 20 %}
+                <td colspan="100%">... other {{hidden_success_len}} changed configs were hidden for the sake of brevity</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!--end:Text-->
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+api/settings/*
+docker-compose*
+Dockerfile*
+.dockerignore
+.git
+.gitignore
+**/__pycache__*
+**/*.pyc
+.idea
+api/repositories/*
+ssh.conf
+settings/*
+!settings/.gitkeep
+repositories/*
+!repositories/.gitkeep

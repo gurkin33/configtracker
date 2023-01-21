@@ -1,0 +1,26 @@
+FROM python:3.10.9-bullseye
+
+WORKDIR /app
+
+# install required linux modules
+RUN apt update
+RUN apt install libmagic-dev git supervisor cron telnet -y
+
+# install dependencies
+RUN pip install --upgrade pip
+COPY ../requirements.txt /app
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+EXPOSE 8090
+
+COPY .. .
+COPY ../supervisord-dev.conf /etc/supervisor/conf.d/
+
+RUN mkdir -p /etc/ssh/ssh_config.d
+RUN if [ $(cat /etc/ssh/ssh_config | grep Include.*ssh_config.d | wc -l) == 1 ]; then echo "Include /etc/ssh/ssh_config.d/*.conf" >> /etc/ssh/ssh_config; fi
+
+ENV FLASK_APP=api/app.py
+ENV FLASK_DEBUG=1
+
+RUN chmod u+x entrypoint-dev.sh
+ENTRYPOINT ["/app/entrypoint-dev.sh"]

@@ -1,0 +1,48 @@
+version: '3.8'
+networks:
+  ct-net-dev:
+    name: ct-net-dev
+    driver: bridge
+volumes:
+  pgdata-dev:
+    name: pgdata-dev
+  repositories-dev:
+    name:
+      repositories-dev
+  settings-dev:
+    name:
+      settings-dev
+
+services:
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: configtracker-dev-db
+    environment:
+      POSTGRES_DB: "configtracker"
+      POSTGRES_USER: "configtracker"
+      POSTGRES_PASSWORD: "configtracker"
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    networks:
+      - ct-net-dev
+    ports:
+      - "5433:5432"
+  configtracker:
+    depends_on:
+      - postgres-dev
+    image: configtracker-dev
+    container_name: configtracker-dev
+    build:
+      dockerfile: ./api/Dockerfile-dev
+    volumes:
+      - ${PROJECT_PATH_API}:/app
+      - ${PROJECT_PATH_API}/ssh.conf:/etc/ssh/ssh_config.d/ssh.conf:ro
+      - repositories-dev:/app/api/repositories
+      - settings-dev:/app/api/settings
+    networks:
+      - ct-net-dev
+    environment:
+      DATABASE_URL: postgresql+psycopg2://configtracker:configtracker@postgres-dev:5432/configtracker
+      JWT_SECRET_KEY: 'super_secret_configtracker'
+    ports:
+      - "8090:8090"

@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>ConfigTracker - {{ title }}</title>
+
+    {% include 'parts/head-style.html' %}
+  </head>
+  <body>
+    <div class="root">
+        <!--begin::Email template-->
+        <div class="card-email">
+            <div class="card-email-body {{base_body_class}}">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" height="auto" style="border-collapse:collapse">
+                    <tbody>
+                        <tr>
+                            <td valign="center">
+                                <!--begin:Email content-->
+                                <!-- START CENTERED WHITE CONTAINER -->
+                                {% block content %}{% endblock %}
+                                <!-- END CENTERED WHITE CONTAINER -->
+                                <!--end:Email content-->
+                            </td>
+                        </tr>
+                        {% include 'parts/footer.html' %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--end::Email template-->
+    </div>
+  </body>
+</html>

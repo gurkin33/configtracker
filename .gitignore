@@ -1,0 +1,12 @@
+ssh.conf
+venv*
+.idea
+dist
+__pycache__
+.env-dev
+/repositories/*
+!/repositories/.gitkeep
+/settings/*
+!/settings/.gitkeep
+nginx/configtracker.crt
+nginx/configtracker.key

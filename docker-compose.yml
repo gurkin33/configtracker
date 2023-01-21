@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Database container
+  postgres:
+    image: postgres:15-alpine
+    container_name: configtracker-db
+    environment:
+      POSTGRES_DB: "configtracker"
+      POSTGRES_USER: "configtracker"
+      POSTGRES_PASSWORD: "configtracker"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - configtracker-net
+    expose:
+      - 5432
+# Uncomment below if you want to connect to database directly
+#    ports:
+#      - "5432:5432"
+  # Config Tracker container
+  configtracker:
+    depends_on:
+      - postgres
+    image: gurkin33/configtracker
+    container_name: configtracker
+    volumes:
+      - repositories:/app/repositories
+      - settings:/app/settings
+      - nginx-web:/app/dist
+#      - <path to ssh config file>/ssh.conf:/etc/ssh/ssh_config.d/ssh.conf:ro
+    networks:
+      - configtracker-net
+    environment:
+      DATABASE_URL: postgresql+psycopg2://configtracker:configtracker@postgres:5432/configtracker
+    expose:
+      - 5000
+  #NGINX
+  nginx:
+    build: ./nginx
+    image: configtracker-nginx
+    container_name: configtracker-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - configtracker
+    volumes:
+      - nginx-web:/opt/dist/
+    networks:
+      - configtracker-net
+
+networks:
+  configtracker-net:
+    name: configtracker-net
+    driver: bridge
+volumes:
+  pgdata:
+    name: pgdata
+  repositories:
+    name: repositories
+  settings:
+    name: settings
+  nginx-web:
+    name: nginx-web
